@@ -29,7 +29,11 @@ public class PuzzleState {
      * Returns -1 if not found. (Should never happen for valid input.)
      */
     public int posOf(int tile) {
-        // *************************** TO DO
+        for(int i = 0; i < tiles.length; i++) {
+            if(tiles[i] == tile) {
+                return i;
+            }
+        }
         return -1;
     }
     
