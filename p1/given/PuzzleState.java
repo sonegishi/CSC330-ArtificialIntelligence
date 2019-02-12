@@ -4,15 +4,16 @@ import java.util.Arrays;
 /**
  * Represents a state (placement of tiles) of the puzzle.
  * Starter code.
+ * 
  * @author Steven Bogaerts
  */
 public class PuzzleState {
-    
+
     /**
      * A 1-D array representation of the tile placement.
      */
     private int[] tiles;
-    
+
     /**
      * Assumes that initialTiles is the valid format:
      * length 9,
@@ -96,7 +97,7 @@ public class PuzzleState {
     private int calcIdx(int row_idx, int col_idx) {
         return row_idx * 3 + col_idx;
     }
-    
+
     /**
      * Returns true if two PuzzleState objects are equivalent,
      * false otherwise. Required for proper operation of a HashSet of PuzzleStates.
@@ -108,7 +109,7 @@ public class PuzzleState {
         else
             return Arrays.equals(this.tiles, ((PuzzleState) other).tiles);
     }
-    
+
     /**
      * Required to be able to have a HashSet of PuzzleState objects.
      * Objects for which .equals() returns true must have the same hashCode.
@@ -117,7 +118,7 @@ public class PuzzleState {
     public int hashCode() {
         return Arrays.hashCode(tiles);
     }
-    
+
     /**
      * Returns a String representation of the state.
      */
@@ -127,13 +128,14 @@ public class PuzzleState {
         for(int i = 0; i < tiles.length; i++) {
             if ((i > 0) && i % 3 == 0)
                 result += "\n";
-                
+
             if (tiles[i] == 0)
                 result += "_ ";
             else
                 result += tiles[i] + " ";
         }
-                
+
         return result + "\n";
     }
+
 }
