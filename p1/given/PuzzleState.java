@@ -36,15 +36,14 @@ public class PuzzleState {
         }
         return -1;
     }
-    
+
     /**
      * Returns the tile value at the given index (0 through 8, inclusive).
      */
     public int getTileAt(int index) {
-        // *************************** TO DO
-        return -1;
+        return tiles[index];
     }
-    
+
     /**
      * Returns a list of PuzzleStates that can be reached from this PuzzleState
      * in one move. It's easiest to think of this as moving the blank.
