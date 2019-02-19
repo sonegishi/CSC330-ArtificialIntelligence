@@ -78,6 +78,7 @@ public class SearchProblem {
             if (goalState.equals(n)){
                 System.out.println("States checked: " + limitCount);
                 System.out.println("Solution length: " + p.length());
+                System.out.println("Solution:");
                 System.out.println(p);
                 return true;
             }
