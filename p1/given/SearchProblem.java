@@ -16,7 +16,6 @@ public class SearchProblem {
 
     private Queue<PuzzlePath> frontier;
     private HashSet<PuzzleState> expanded; 
-
     private PuzzleState initState;
     private PuzzleState goalState;
 
