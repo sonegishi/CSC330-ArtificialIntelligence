@@ -47,7 +47,6 @@ public class SearchProblem {
      * Otherwise pass an appropriate Heuristic object.
      */
     public SearchProblem(PuzzleState initState, PuzzleState goalState, String queueType, int goalCheckLimit, Heuristic h) {
-        // *************************** TO DO - do whatever initialization you need here
         this.h = h;
         if (queueType == "FIFO")
             frontier = new LinkedList<PuzzlePath>();
