@@ -14,7 +14,6 @@ import java.util.Stack;
  */
 public class SearchProblem {
 
-    // *************************** TO DO - define whatever fields you need here
     private Queue<PuzzlePath> frontier;
     private HashSet<PuzzleState> expanded; 
 
