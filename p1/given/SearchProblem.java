@@ -57,7 +57,6 @@ public class SearchProblem {
         this.initState = initState;
         this.goalState = goalState;
         this.goalCheckLimit = goalCheckLimit;
-        
         // Check the value of queueType, and set the frontier to the correct type.
     }
 
