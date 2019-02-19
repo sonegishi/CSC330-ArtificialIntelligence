@@ -18,7 +18,6 @@ public class SearchProblem {
     private HashSet<PuzzleState> expanded; 
     private PuzzleState initState;
     private PuzzleState goalState;
-
     private int goalCheckLimit;
     private Heuristic h;
     private String queueType;
