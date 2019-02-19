@@ -20,7 +20,6 @@ public class SearchProblem {
     private PuzzleState goalState;
     private int goalCheckLimit;
     private Heuristic h;
-    private String queueType;
 
     /**
      * This Comparator object is an instance of an anonymous class.
