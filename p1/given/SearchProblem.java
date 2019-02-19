@@ -3,6 +3,7 @@ import java.util.PriorityQueue;
 import java.util.LinkedList;
 import java.util.HashSet;
 import java.util.Comparator;
+import java.util.Stack;
 
 /**
  * Represents a search problem to be solved.
@@ -15,18 +16,25 @@ public class SearchProblem {
 
     // *************************** TO DO - define whatever fields you need here
     private Queue<PuzzlePath> frontier;
-        
-    
+    private HashSet<PuzzleState> expanded; 
+
+    private PuzzleState initState;
+    private PuzzleState goalState;
+
+    private int goalCheckLimit;
+    private Heuristic h;
+    private String queueType;
+
     /**
      * This Comparator object is an instance of an anonymous class.
      * It compares two paths based on cost, for use in the PriorityQueue, for ordering.
      */
     public static Comparator<PuzzlePath> pathComparator = new Comparator<PuzzlePath>() {
-        public int compare(PuzzlePath p1, PuzzlePath p2) {
-            return p1.getCost() - p2.getCost();
-        }
-    };
-    
+            public int compare(PuzzlePath p1, PuzzlePath p2) {
+                return p1.getCost() - p2.getCost();
+            }
+        };
+
     /**
      * Constructs a new SearchProblem.
      * 
@@ -41,17 +49,53 @@ public class SearchProblem {
      */
     public SearchProblem(PuzzleState initState, PuzzleState goalState, String queueType, int goalCheckLimit, Heuristic h) {
         // *************************** TO DO - do whatever initialization you need here
+        this.h = h;
+        if (queueType == "FIFO")
+            frontier = new LinkedList<PuzzlePath>();
+        else if (queueType == "Ordered")
+            frontier = new PriorityQueue<PuzzlePath>(pathComparator);
+        else 
+            System.err.println("queueType is set improperly.");
+        this.initState = initState;
+        this.goalState = goalState;
+        this.goalCheckLimit = goalCheckLimit;
         
         // Check the value of queueType, and set the frontier to the correct type.
     }
-    
+
     /**
      * Solve this search problem.
      */
     public boolean solve() {
-        // *************************** TO DO
+        frontier.offer(new PuzzlePath(initState, h));
+        expanded = new HashSet<PuzzleState>();
+        PuzzleState n;
+        PuzzlePath p;
+        PuzzlePath copy;
+        int limitCount = 0;
+        LinkedList<PuzzleState> expandables = new LinkedList<PuzzleState>();
 
+        while (!frontier.isEmpty() && goalCheckLimit > limitCount){
+            p = frontier.poll();
+            n = p.stateAtEndOfPath();
+            limitCount++;
+            if (goalState.equals(n)){
+                System.out.println("States checked: " + limitCount);
+                System.out.println("Solution length: " + p.length());
+                System.out.println(p);
+                return true;
+            }
+            expandables = n.expand();
+            expanded.add(n);
+            for (PuzzleState s : expandables){
+                if (!expanded.contains(s)){
+                    copy = p.makeCopy();
+                    copy.addState(s);
+                    frontier.offer(copy);
+                }
+            }
+        }
         return false;
-    }
-        
+    }   
+
 }
