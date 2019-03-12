@@ -6,9 +6,9 @@ import java.util.ArrayList;
  */
 public class So_Keisuke_Player extends PlayerDef {
     public static final int WINDOW_SCORE_1 = 1;
-    public static final int WINDOW_SCORE_2 = 2;
-    public static final int WINDOW_SCORE_3 = 3;
-    public static final int WINDOW_SCORE_4 = 4;
+    public static final int WINDOW_SCORE_2 = 8;
+    public static final int WINDOW_SCORE_3 = 27;
+    public static final int WINDOW_SCORE_4 = 2019;
     public static final int NUM_COLS = 7;
     public static final int NUM_ROWS = 6;
 
@@ -81,9 +81,13 @@ public class So_Keisuke_Player extends PlayerDef {
         int count = 0;
         for(int colID = 0; colID < NUM_COLS; colID++) {
             for(int rowID = 0; rowID < NUM_ROWS; rowID++) {
+                // down
                 total_score += checkWindow(rowID, colID, 1, 0);
+                // right 
                 total_score += checkWindow(rowID, colID, 0, 1);
+                // right up
                 total_score += checkWindow(rowID, colID, -1, 1);
+                // right down
                 total_score += checkWindow(rowID, colID, 1, 1);
             }
         }
@@ -92,44 +96,71 @@ public class So_Keisuke_Player extends PlayerDef {
 
     protected int checkWindow(int startRowID, int startColID, int rowChange, int colChange) {
         char currPiece;
+        // int[] window_count_arr = new int[3];
+        // set to default false value for boolean
         int score = 0;
-        int[] window_count_arr = new int[3];
-        boolean was_one_window_player = false;
-        boolean was_two_window_player = false;
-        boolean was_one_window_opponent = false;
-        boolean was_two_window_opponent = false;
-        for(int i = 0; startRowID + i*rowChange >= 0 && startColID + i*colChange >= 0 && startRowID + i*rowChange < NUM_ROWS && startColID + i*colChange < NUM_COLS; i++) {
+        boolean[] is_window_connected_player = new boolean[3];
+        boolean[] is_window_connected_opponent = new boolean[3];   
+        for(int i = 0; startRowID + i*rowChange >= 0 && startColID + i*colChange >= 0 && startRowID + i*rowChange < NUM_ROWS && startColID + i*colChange < NUM_COLS && i < 4; i++) {
             currPiece = currState.getPiece(startRowID + i*rowChange, startColID + i*colChange);
-            if (currPiece == super.playerSymbol){
-                if(was_two_window_player == true) {
-                    window_count_arr[2] += WINDOW_SCORE_3;
-                } else if (was_one_window_player == true) {
-                    window_count_arr[1] += WINDOW_SCORE_2;
-                    was_two_window_player = true;
+            if (currPiece == super.playerSymbol)
+            {
+                if (is_window_connected_player[2])
+                {
+                    score += WINDOW_SCORE_4;
                 } 
-                window_count_arr[0] += WINDOW_SCORE_1;
-                was_one_window_player = true;
-                was_one_window_opponent = false;
-                was_two_window_opponent = false;
+                else if (is_window_connected_player[1]) 
+                {
+                    score += WINDOW_SCORE_3;
+                    is_window_connected_player[2] = true;
+                } 
+                else if (is_window_connected_player[0]) 
+                {
+                    score += WINDOW_SCORE_2;
+                    is_window_connected_player[1] = true;
+                } 
+                else 
+                {
+                    score += WINDOW_SCORE_1;
+                    is_window_connected_player[0] = true;
+                }
+                is_window_connected_opponent = new boolean[3];
             }
-            else if (currPiece != '_'){
-                if(was_two_window_opponent == true) {
-                    window_count_arr[2] -= WINDOW_SCORE_3;
-                } else if (was_one_window_opponent == true) {
-                    window_count_arr[1] -= WINDOW_SCORE_2;
-                    was_two_window_opponent = true;
+            else if (currPiece != '_')
+            {
+                if (is_window_connected_opponent[2])
+                {
+                    score -= WINDOW_SCORE_4;
                 } 
-                window_count_arr[0] -= WINDOW_SCORE_1;
-                was_one_window_opponent = true;
-                was_one_window_player = false;
-                was_two_window_player = false;
+                else if (is_window_connected_opponent[1])
+                {
+                    score -= WINDOW_SCORE_3;
+                    is_window_connected_opponent[2] = true;
+                } 
+                else if (is_window_connected_opponent[0]) 
+                {
+                    score -= WINDOW_SCORE_2;
+                    is_window_connected_opponent[1] = true;
+                } 
+                else 
+                {
+                    score -= WINDOW_SCORE_1;
+                    is_window_connected_opponent[0] = true;
+                }
+                is_window_connected_player = new boolean[3];
             } else {
                 // when it is blank
             }
+            // System.out.print("ROW: " + (startRowID + i*rowChange));
+            // System.out.print("  COL: " + (startColID + i*colChange)); 
+            // System.out.print("  SCORE: " + score);
+
         }
-        score += window_count_arr[0];
-        score += window_count_arr[1];
-        score += window_count_arr[2];
+        // System.out.println("");
+        // System.out.println("-------------------");
+        // score += window_count_arr[0];
+        // score += window_count_arr[1];
+        // score += window_count_arr[2];
         return score;
     }
 
