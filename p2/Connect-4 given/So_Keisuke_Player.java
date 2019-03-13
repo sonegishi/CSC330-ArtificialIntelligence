@@ -148,8 +148,6 @@ public class So_Keisuke_Player extends PlayerDef {
                     is_window_connected_opponent[0] = true;
                 }
                 is_window_connected_player = new boolean[3];
-            } else {
-                // when it is blank
             }
             // System.out.print("ROW: " + (startRowID + i*rowChange));
             // System.out.print("  COL: " + (startColID + i*colChange)); 
