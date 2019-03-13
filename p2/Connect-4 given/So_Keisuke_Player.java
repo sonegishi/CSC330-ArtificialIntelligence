@@ -21,7 +21,6 @@ public class So_Keisuke_Player extends PlayerDef {
      */
     public So_Keisuke_Player() {
         super(); // call super class constructor (must be first line of this method)
-        // Do whatever other initialization you need here
         states = new ArrayList<State>();
     }
 
@@ -81,19 +80,26 @@ public class So_Keisuke_Player extends PlayerDef {
         int count = 0;
         for(int colID = 0; colID < NUM_COLS; colID++) {
             for(int rowID = 0; rowID < NUM_ROWS; rowID++) {
-                // down
+                // top to bottom
                 total_score += checkWindow(rowID, colID, 1, 0);
-                // right 
+                // left to right 
                 total_score += checkWindow(rowID, colID, 0, 1);
-                // right up
+                // bottom left to top right
                 total_score += checkWindow(rowID, colID, -1, 1);
-                // right down
+                // top left to bottom right
                 total_score += checkWindow(rowID, colID, 1, 1);
             }
         }
         return total_score;
     }
 
+    /**
+     * Returns scores in the given range of rows and columns.
+     * @param startRowID: Starting 
+     * @param startColID: 
+     * @param rowChange: 
+     * @param colChange: 
+     */
     protected int checkWindow(int startRowID, int startColID, int rowChange, int colChange) {
         char currPiece;
         // int[] window_count_arr = new int[3];
@@ -101,8 +107,11 @@ public class So_Keisuke_Player extends PlayerDef {
         int score = 0;
         boolean[] is_window_connected_player = new boolean[3];
         boolean[] is_window_connected_opponent = new boolean[3];   
-        for(int i = 0; startRowID + i*rowChange >= 0 && startColID + i*colChange >= 0 && startRowID + i*rowChange < NUM_ROWS && startColID + i*colChange < NUM_COLS && i < 4; i++) {
-            currPiece = currState.getPiece(startRowID + i*rowChange, startColID + i*colChange);
+        for(int i = 0;
+            (startRowID + i*rowChange >= 0) && (startColID + i*colChange >= 0) &&
+            (startRowID + i*rowChange < NUM_ROWS) && (startColID + i*colChange < NUM_COLS) && (i < 4);
+            i++) {
+            currPiece = this.currState.getPiece(startRowID + i*rowChange, startColID + i*colChange);
             if (currPiece == super.playerSymbol)
             {
                 if (is_window_connected_player[2])
