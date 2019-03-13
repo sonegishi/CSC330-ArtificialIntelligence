@@ -7,8 +7,8 @@ public class Part1Tester {
     
     public static void go() {
         // Of course, change the next two lines based on whatever you name your player class.
-        NAME_ME_Player px = new NAME_ME_Player();
-        NAME_ME_Player po = new NAME_ME_Player();
+        So_Keisuke_Player px = new So_Keisuke_Player();
+        So_Keisuke_Player po = new So_Keisuke_Player();
         
         px.setSymbol('X');
         px.setTotalTime(-1);
