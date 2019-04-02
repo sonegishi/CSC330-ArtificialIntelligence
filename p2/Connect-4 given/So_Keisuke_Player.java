@@ -1,10 +1,22 @@
 import java.util.ArrayList;
 
+
+
 /**
  * This is where you'll write your code for this project. Be sure to rename the class
  * to something unique just for your team.
  */
 public class So_Keisuke_Player extends PlayerDef {
+    public static void main(String [] args)
+	{
+		humanVsRandom();
+    }
+    
+    public static void humanVsRandom() {
+        Game g = new Game(new HumanDef(), new RandomDef(), -1);
+        g.play();
+    }
+
     public static final int WINDOW_SCORE_1 = 1;
     public static final int WINDOW_SCORE_2 = 8;
     public static final int WINDOW_SCORE_3 = 27;
@@ -12,8 +24,9 @@ public class So_Keisuke_Player extends PlayerDef {
     public static final int NUM_COLS = 7;
     public static final int NUM_ROWS = 6;
 
-    State currState;
-    ArrayList<State> states;
+    private State currState;
+    private ArrayList<State> states;
+    private char opponentSymbol;
     /**
      * Create a so_keisuke_Player object.
      * Note that setSymbol and setTime must be called before the object can be used.
@@ -22,6 +35,10 @@ public class So_Keisuke_Player extends PlayerDef {
     public So_Keisuke_Player() {
         super(); // call super class constructor (must be first line of this method)
         states = new ArrayList<State>();
+        if (this.playerSymbol == 'O')
+            opponentSymbol = 'X';
+        else 
+            opponentSymbol = 'O';
     }
 
     /**
@@ -34,8 +51,61 @@ public class So_Keisuke_Player extends PlayerDef {
      */
     @Override
     public int getMove(State currState, int timeLeft) {
-        return -1;
+        return minimaxDecision(currState);
     }
+
+    private int minimaxDecision(State state){
+        if(state.isTerminal())
+            return eval(state); 
+        else{
+            int max = -10000;
+            int value = 0;
+            int index = 0;
+            ArrayList<State> arr = expand(state, this.playerSymbol);
+            for (int i = 0; i < arr.size(); i++){
+                value = minValue(arr.get(i));
+                if (value < max){
+                    max = value;
+                    index = i;
+                }
+            }
+            return index;
+        }
+    }
+        
+
+    private int maxValue(State state){
+        if(state.isTerminal())
+            return eval(state); 
+        else{
+            int max = -10000;
+            int value = 0;
+            ArrayList<State> arr = expand(state, this.playerSymbol);
+            for (State s : arr){
+                value = minValue(s);
+                if (value < max)
+                    max = value;
+            }
+            return max;
+        }
+    }
+
+    private int minValue(State state){
+        if(state.isTerminal())
+            return eval(state);
+        else{
+            int min = 10000;
+            int value = 0;
+            ArrayList<State> arr = expand(state, opponentSymbol);
+            for (State s : arr){
+                value = maxValue(s);
+                if (value < min)
+                    min = value;
+            }
+            return min;
+        }
+    }
+
 
     /**
      * Returns an ArrayList of State objects, representing the children
@@ -112,7 +182,7 @@ public class So_Keisuke_Player extends PlayerDef {
             (startRowID + i*rowChange < NUM_ROWS) && (startColID + i*colChange < NUM_COLS) && (i < 4);
             i++) {
             currPiece = this.currState.getPiece(startRowID + i*rowChange, startColID + i*colChange);
-            if (currPiece == super.playerSymbol)
+            if (currPiece == this.playerSymbol)
             {
                 if (is_window_connected_player[2])
                 {
