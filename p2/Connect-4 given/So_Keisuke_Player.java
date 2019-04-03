@@ -11,7 +11,7 @@ public class So_Keisuke_Player extends PlayerDef {
     public static final int WINDOW_SCORE_4 = 2019;
     public static final int NUM_COLS = 7;
     public static final int NUM_ROWS = 6;
-    public static final int DEPTH_LIMIT = 2;
+    public static final int DEPTH_LIMIT = 4;
 
     State currState;
     char opponentSymbol;
@@ -52,20 +52,19 @@ public class So_Keisuke_Player extends PlayerDef {
         this.opponentSymbol = (this.playerSymbol == 'O') ? 'X' : 'O';
 
         int depth = 0;
-        int col_num = 0;
+        int colNum = 0;
         int v = Integer.MIN_VALUE;
-        int temp_v = Integer.MIN_VALUE;
+        int tempV = Integer.MIN_VALUE;
         ArrayList<State> states = expand(currState, playerSymbol);
         for (int i = 0; i < states.size(); i++) {
-            temp_v = v;
-            // System.out.println("minValue " + i + ": " + eval(states.get(i)) + "\n");
+            tempV = v;
             v = Math.max(v, minValue(states.get(i), timeLeft, depth));
-            if (v != temp_v) {
-                col_num = i;
+            if (v != tempV) {
+                colNum = i;
             }
         }
-        System.out.println("MAX_VALUE "+ col_num + ": " + v + "\n");
-        return col_num;
+        System.out.println("MAX_VALUE "+ colNum + ": " + v + "\n");
+        return colNum;
     }
 
     /**
@@ -73,13 +72,11 @@ public class So_Keisuke_Player extends PlayerDef {
      */
     private int maxValue(State currState, int timeLeft, int depth) {
         if (currState.isTerminal() || depth >= DEPTH_LIMIT) {
-            // System.out.println("MAX_VALUE: " + eval(currState) + "\n");
             return eval(currState);
         }
 
         int v = Integer.MIN_VALUE;
         for (State s : expand(currState, playerSymbol)) {
-            // System.out.println("MAX_STATE: " + s + "\n");
             if (s != null) {
                 v = Math.max(v, minValue(s, timeLeft, depth+1));
             }
@@ -92,13 +89,11 @@ public class So_Keisuke_Player extends PlayerDef {
      */
     private int minValue(State currState, int timeLeft, int depth) {
         if (currState.isTerminal() || depth >= DEPTH_LIMIT) {
-            // System.out.println("minValue: " + eval(currState) + "\n");
             return eval(currState);
         }
 
         int v = Integer.MAX_VALUE;
         for (State s : expand(currState, opponentSymbol)) {
-            // System.out.println("minState: " + s + "\n");
             if (s != null) {
                 v = Math.min(v, maxValue(s, timeLeft, depth+1));
             }
