@@ -7,6 +7,7 @@ import java.util.ArrayList;
 public class So_Keisuke_Player extends PlayerDef {
     public static void main(String [] args)
 	{
+        Part1Tester.go();
 		humanVsComputer();
     }
     
@@ -16,14 +17,14 @@ public class So_Keisuke_Player extends PlayerDef {
         g.play();
     }
 
-    public static final int WINDOW_SCORE_1 = 1;
-    public static final int WINDOW_SCORE_2 = 8;
+    public static final int WINDOW_SCORE_1 = 0;
+    public static final int WINDOW_SCORE_2 = 50;
     public static final int WINDOW_SCORE_3 = 200;
     public static final int WINDOW_SCORE_4 = 2019;
     public static final int NUM_COLS = 7;
     public static final int NUM_ROWS = 6;
 
-    public static final int DEPTH_LIMIT = 5;
+    public static final int DEPTH_LIMIT = 3;
 
     private State currState;
     private char opponentSymbol;
@@ -55,16 +56,16 @@ public class So_Keisuke_Player extends PlayerDef {
     }
 
     private int minimaxDecision(State state){
-        int min =  Integer.MAX_VALUE;
+        int max = Integer.MIN_VALUE;
         int value = 0;
         int index = 0;
         int depth = 0;
         ArrayList<State> arr = expand(state, playerSymbol);
         for (int i = 0; i < arr.size(); i++){
-            value = maxValue(arr.get(i), depth+1);
+            value = minValue(arr.get(i), depth+1);
             if (arr.get(i) != null){
-                if (value < min){
-                    min = value;
+                if (value > max){
+                    max = value;
                     index = i;
                 }
             }
@@ -75,7 +76,7 @@ public class So_Keisuke_Player extends PlayerDef {
 
     private int maxValue(State state, int depth){
         if(state.isTerminal() || depth >= DEPTH_LIMIT){
-            // System.out.println(state);
+            // System.out.println(state); 
             return eval(state); 
         }
         else{
