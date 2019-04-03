@@ -1,7 +1,5 @@
 import java.util.ArrayList;
 
-
-
 /**
  * This is where you'll write your code for this project. Be sure to rename the class
  * to something unique just for your team.
@@ -14,17 +12,18 @@ public class So_Keisuke_Player extends PlayerDef {
     
     public static void humanVsComputer() {
         Game g = new Game(new HumanDef(), new So_Keisuke_Player(), -1);
+
         g.play();
     }
 
     public static final int WINDOW_SCORE_1 = 1;
     public static final int WINDOW_SCORE_2 = 8;
-    public static final int WINDOW_SCORE_3 = 27;
+    public static final int WINDOW_SCORE_3 = 200;
     public static final int WINDOW_SCORE_4 = 2019;
     public static final int NUM_COLS = 7;
     public static final int NUM_ROWS = 6;
 
-    public static final int DEPTH_LIMIT = 6;
+    public static final int DEPTH_LIMIT = 5;
 
     private State currState;
     private char opponentSymbol;
@@ -35,7 +34,8 @@ public class So_Keisuke_Player extends PlayerDef {
      */
     public So_Keisuke_Player() {
         super(); // call super class constructor (must be first line of this method)
-        if (this.playerSymbol == 'O')
+        playerSymbol = 'O';
+        if (playerSymbol == 'O')
             opponentSymbol = 'X';
         else 
             opponentSymbol = 'O';
@@ -55,68 +55,51 @@ public class So_Keisuke_Player extends PlayerDef {
     }
 
     private int minimaxDecision(State state){
-        if(state.isTerminal()){
-            return eval(state); 
-        }
-        else{
-            int max = -10000;
-            int value = 0;
-            int index = 0;
-            int depth = 0;
-            ArrayList<State> arr = expand(state, this.playerSymbol);
-            for (int i = 0; i < arr.size(); i++){
-                value = maxValue(arr.get(i), -10000, 10000, depth+1);
-                if (arr.get(i) != null){
-                    if (value > max){
-                        max = value;
-                        index = i;
-                    }
+        int min =  Integer.MAX_VALUE;
+        int value = 0;
+        int index = 0;
+        int depth = 0;
+        ArrayList<State> arr = expand(state, playerSymbol);
+        for (int i = 0; i < arr.size(); i++){
+            value = maxValue(arr.get(i), depth+1);
+            if (arr.get(i) != null){
+                if (value < min){
+                    min = value;
+                    index = i;
                 }
             }
-            return index;
         }
+        return index;
     }
         
 
-    private int maxValue(State state, int alpha, int beta, int depth){
-        if(state.isTerminal() || depth > DEPTH_LIMIT){
+    private int maxValue(State state, int depth){
+        if(state.isTerminal() || depth >= DEPTH_LIMIT){
+            // System.out.println(state);
             return eval(state); 
         }
         else{
-            int max = -10000;
-            int value = 0;
-            ArrayList<State> arr = expand(state, this.playerSymbol);
+            int max = Integer.MIN_VALUE;
+            ArrayList<State> arr = expand(state, playerSymbol);
             for (State s : arr){
-                if (s != null){
-                    value = minValue(s, alpha, beta, depth+1);
-                    if (value > max)
-                        max = value;
-                    if (max >= beta)
-                        return max;
-                    alpha = max;
-                }
+                if (s != null)
+                    max = Math.max(max, minValue(s, depth+1));
             }
             return max;
         }
     }
 
-    private int minValue(State state, int alpha, int beta, int depth){
-        if(state.isTerminal() || depth > DEPTH_LIMIT){
+    private int minValue(State state, int depth){
+        if(state.isTerminal() || depth >= DEPTH_LIMIT){
+            // System.out.println(state);
             return eval(state); 
         }
         else{
-            int min = 10000;
-            int value = 0;
+            int min = Integer.MAX_VALUE;
             ArrayList<State> arr = expand(state, opponentSymbol);
             for (State s : arr){
-                if (s != null){
-                    value = maxValue(s, alpha, beta, depth+1);
-                    if (value < min)
-                        min = value;
-                    if (min <= alpha)
-                        return min;
-                    beta = min;
-                }
+                if (s != null)
+                    min = Math.min(min, maxValue(s, depth+1));
             }
             return min;
         }
@@ -165,7 +148,7 @@ public class So_Keisuke_Player extends PlayerDef {
     protected int eval(State currState) {
         this.currState = currState;
         int total_score = 0;
-        int count = 0;
+        // int count = 0;
         for(int colID = 0; colID < NUM_COLS; colID++) {
             for(int rowID = 0; rowID < NUM_ROWS; rowID++) {
                 // top to bottom
