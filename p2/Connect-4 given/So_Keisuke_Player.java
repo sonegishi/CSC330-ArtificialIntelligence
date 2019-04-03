@@ -9,11 +9,11 @@ import java.util.ArrayList;
 public class So_Keisuke_Player extends PlayerDef {
     public static void main(String [] args)
 	{
-		humanVsRandom();
+		humanVsComputer();
     }
     
-    public static void humanVsRandom() {
-        Game g = new Game(new HumanDef(), new RandomDef(), -1);
+    public static void humanVsComputer() {
+        Game g = new Game(new HumanDef(), new So_Keisuke_Player(), -1);
         g.play();
     }
 
@@ -24,8 +24,9 @@ public class So_Keisuke_Player extends PlayerDef {
     public static final int NUM_COLS = 7;
     public static final int NUM_ROWS = 6;
 
+    public static final int DEPTH_LIMIT = 5;
+
     private State currState;
-    private ArrayList<State> states;
     private char opponentSymbol;
     /**
      * Create a so_keisuke_Player object.
@@ -34,7 +35,6 @@ public class So_Keisuke_Player extends PlayerDef {
      */
     public So_Keisuke_Player() {
         super(); // call super class constructor (must be first line of this method)
-        states = new ArrayList<State>();
         if (this.playerSymbol == 'O')
             opponentSymbol = 'X';
         else 
@@ -55,18 +55,22 @@ public class So_Keisuke_Player extends PlayerDef {
     }
 
     private int minimaxDecision(State state){
-        if(state.isTerminal())
+        if(state.isTerminal()){
             return eval(state); 
+        }
         else{
             int max = -10000;
             int value = 0;
             int index = 0;
+            int depth = 0;
             ArrayList<State> arr = expand(state, this.playerSymbol);
             for (int i = 0; i < arr.size(); i++){
-                value = minValue(arr.get(i));
-                if (value < max){
-                    max = value;
-                    index = i;
+                value = minValue(arr.get(i), depth+1);
+                if (arr.get(i) != null){
+                    if (value > max){
+                        max = value;
+                        index = i;
+                    }
                 }
             }
             return index;
@@ -74,33 +78,39 @@ public class So_Keisuke_Player extends PlayerDef {
     }
         
 
-    private int maxValue(State state){
-        if(state.isTerminal())
+    private int maxValue(State state, int depth){
+        if(state.isTerminal() || depth > DEPTH_LIMIT){
             return eval(state); 
+        }
         else{
             int max = -10000;
             int value = 0;
             ArrayList<State> arr = expand(state, this.playerSymbol);
             for (State s : arr){
-                value = minValue(s);
-                if (value < max)
-                    max = value;
+                if (s != null){
+                    value = minValue(s, depth+1);
+                    if (value > max)
+                        max = value;
+                }
             }
             return max;
         }
     }
 
-    private int minValue(State state){
-        if(state.isTerminal())
-            return eval(state);
+    private int minValue(State state, int depth){
+        if(state.isTerminal() || depth > DEPTH_LIMIT){
+            return eval(state); 
+        }
         else{
             int min = 10000;
             int value = 0;
             ArrayList<State> arr = expand(state, opponentSymbol);
             for (State s : arr){
-                value = maxValue(s);
-                if (value < min)
-                    min = value;
+                if (s != null){
+                    value = maxValue(s, depth+1);
+                    if (value < min)
+                        min = value;
+                }
             }
             return min;
         }
@@ -120,7 +130,9 @@ public class So_Keisuke_Player extends PlayerDef {
      * is not necessarily the same as the playerSymbol field inherited from PlayerDef!
      */
     protected ArrayList<State> expand(State currState, char symbol) {
+        
         State copyCurrState;
+        ArrayList<State> states = new ArrayList<State>();
         for (int colID = 0; colID < 7; colID++){
             copyCurrState = new State(currState);
             if (copyCurrState.move(colID, symbol))
