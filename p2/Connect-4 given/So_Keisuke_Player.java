@@ -11,17 +11,25 @@ public class So_Keisuke_Player extends PlayerDef {
     public static final int WINDOW_SCORE_4 = 2019;
     public static final int NUM_COLS = 7;
     public static final int NUM_ROWS = 6;
+    public static final int DEPTH_LIMIT = 2;
 
     State currState;
-    ArrayList<State> states;
+    char opponentSymbol;
     /**
      * Create a so_keisuke_Player object.
      * Note that setSymbol and setTime must be called before the object can be used.
      * This is done in the Game constructor.
      */
     public So_Keisuke_Player() {
-        super(); // call super class constructor (must be first line of this method)
-        states = new ArrayList<State>();
+        super();
+    }
+
+    /**
+     * A convenience method for starting a game between a human and a random player.
+     */
+    public static void humanVsRandom() {
+        Game g = new Game(new HumanDef(), new So_Keisuke_Player(), -1);
+        g.play();
     }
 
     /**
@@ -29,12 +37,73 @@ public class So_Keisuke_Player extends PlayerDef {
      * Ultimately, this will be minimax with alpha-beta pruning, but get plain
      * old minimax working first, and save a copy of it in case you mess something
      * up while working on alpha-beta pruning.
-     * 
+     *
      * @return the column of the desired move
      */
     @Override
     public int getMove(State currState, int timeLeft) {
-        return -1;
+        return maxValueFirstTime(currState, timeLeft);
+    }
+
+    /**
+     *
+     */
+    private int maxValueFirstTime(State currState, int timeLeft) {
+        this.opponentSymbol = (this.playerSymbol == 'O') ? 'X' : 'O';
+
+        int depth = 0;
+        int col_num = 0;
+        int v = Integer.MIN_VALUE;
+        int temp_v = Integer.MIN_VALUE;
+        ArrayList<State> states = expand(currState, playerSymbol);
+        for (int i = 0; i < states.size(); i++) {
+            temp_v = v;
+            // System.out.println("minValue " + i + ": " + eval(states.get(i)) + "\n");
+            v = Math.max(v, minValue(states.get(i), timeLeft, depth));
+            if (v != temp_v) {
+                col_num = i;
+            }
+        }
+        System.out.println("MAX_VALUE "+ col_num + ": " + v + "\n");
+        return col_num;
+    }
+
+    /**
+     *
+     */
+    private int maxValue(State currState, int timeLeft, int depth) {
+        if (currState.isTerminal() || depth >= DEPTH_LIMIT) {
+            // System.out.println("MAX_VALUE: " + eval(currState) + "\n");
+            return eval(currState);
+        }
+
+        int v = Integer.MIN_VALUE;
+        for (State s : expand(currState, playerSymbol)) {
+            // System.out.println("MAX_STATE: " + s + "\n");
+            if (s != null) {
+                v = Math.max(v, minValue(s, timeLeft, depth+1));
+            }
+        }
+        return v;
+    }
+
+    /**
+     *
+     */
+    private int minValue(State currState, int timeLeft, int depth) {
+        if (currState.isTerminal() || depth >= DEPTH_LIMIT) {
+            // System.out.println("minValue: " + eval(currState) + "\n");
+            return eval(currState);
+        }
+
+        int v = Integer.MAX_VALUE;
+        for (State s : expand(currState, opponentSymbol)) {
+            // System.out.println("minState: " + s + "\n");
+            if (s != null) {
+                v = Math.min(v, maxValue(s, timeLeft, depth+1));
+            }
+        }
+        return v;
     }
 
     /**
@@ -51,6 +120,7 @@ public class So_Keisuke_Player extends PlayerDef {
      */
     protected ArrayList<State> expand(State currState, char symbol) {
         State copyCurrState;
+        ArrayList<State> states = new ArrayList<State>();
         for (int colID = 0; colID < 7; colID++){
             copyCurrState = new State(currState);
             if (copyCurrState.move(colID, symbol))
@@ -72,7 +142,7 @@ public class So_Keisuke_Player extends PlayerDef {
      * Make sure evalState is zero-sum.  That is, if this player evaluates
      * a state as 65, then the other player using the same evaluation
      * function would evaluate it to -65.
-     * 
+     *
      */
     protected int eval(State currState) {
         this.currState = currState;
@@ -82,7 +152,7 @@ public class So_Keisuke_Player extends PlayerDef {
             for(int rowID = 0; rowID < NUM_ROWS; rowID++) {
                 // top to bottom
                 total_score += checkWindow(rowID, colID, 1, 0);
-                // left to right 
+                // left to right
                 total_score += checkWindow(rowID, colID, 0, 1);
                 // bottom left to top right
                 total_score += checkWindow(rowID, colID, -1, 1);
@@ -95,10 +165,10 @@ public class So_Keisuke_Player extends PlayerDef {
 
     /**
      * Returns scores in the given range of rows and columns.
-     * @param startRowID: Starting 
-     * @param startColID: 
-     * @param rowChange: 
-     * @param colChange: 
+     * @param startRowID: Starting
+     * @param startColID:
+     * @param rowChange:
+     * @param colChange:
      */
     protected int checkWindow(int startRowID, int startColID, int rowChange, int colChange) {
         char currPiece;
@@ -106,29 +176,29 @@ public class So_Keisuke_Player extends PlayerDef {
         // set to default false value for boolean
         int score = 0;
         boolean[] is_window_connected_player = new boolean[3];
-        boolean[] is_window_connected_opponent = new boolean[3];   
+        boolean[] is_window_connected_opponent = new boolean[3];
         for(int i = 0;
-            (startRowID + i*rowChange >= 0) && (startColID + i*colChange >= 0) &&
-            (startRowID + i*rowChange < NUM_ROWS) && (startColID + i*colChange < NUM_COLS) && (i < 4);
-            i++) {
+        (startRowID + i*rowChange >= 0) && (startColID + i*colChange >= 0) &&
+        (startRowID + i*rowChange < NUM_ROWS) && (startColID + i*colChange < NUM_COLS) && (i < 4);
+        i++) {
             currPiece = this.currState.getPiece(startRowID + i*rowChange, startColID + i*colChange);
             if (currPiece == super.playerSymbol)
             {
                 if (is_window_connected_player[2])
                 {
                     score += WINDOW_SCORE_4;
-                } 
-                else if (is_window_connected_player[1]) 
+                }
+                else if (is_window_connected_player[1])
                 {
                     score += WINDOW_SCORE_3;
                     is_window_connected_player[2] = true;
-                } 
-                else if (is_window_connected_player[0]) 
+                }
+                else if (is_window_connected_player[0])
                 {
                     score += WINDOW_SCORE_2;
                     is_window_connected_player[1] = true;
-                } 
-                else 
+                }
+                else
                 {
                     score += WINDOW_SCORE_1;
                     is_window_connected_player[0] = true;
@@ -140,18 +210,18 @@ public class So_Keisuke_Player extends PlayerDef {
                 if (is_window_connected_opponent[2])
                 {
                     score -= WINDOW_SCORE_4;
-                } 
+                }
                 else if (is_window_connected_opponent[1])
                 {
                     score -= WINDOW_SCORE_3;
                     is_window_connected_opponent[2] = true;
-                } 
-                else if (is_window_connected_opponent[0]) 
+                }
+                else if (is_window_connected_opponent[0])
                 {
                     score -= WINDOW_SCORE_2;
                     is_window_connected_opponent[1] = true;
-                } 
-                else 
+                }
+                else
                 {
                     score -= WINDOW_SCORE_1;
                     is_window_connected_opponent[0] = true;
@@ -159,7 +229,7 @@ public class So_Keisuke_Player extends PlayerDef {
                 is_window_connected_player = new boolean[3];
             }
             // System.out.print("ROW: " + (startRowID + i*rowChange));
-            // System.out.print("  COL: " + (startColID + i*colChange)); 
+            // System.out.print("  COL: " + (startColID + i*colChange));
             // System.out.print("  SCORE: " + score);
 
         }
