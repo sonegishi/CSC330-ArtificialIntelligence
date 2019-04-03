@@ -24,7 +24,7 @@ public class So_Keisuke_Player extends PlayerDef {
     public static final int NUM_COLS = 7;
     public static final int NUM_ROWS = 6;
 
-    public static final int DEPTH_LIMIT = 5;
+    public static final int DEPTH_LIMIT = 6;
 
     private State currState;
     private char opponentSymbol;
@@ -65,7 +65,7 @@ public class So_Keisuke_Player extends PlayerDef {
             int depth = 0;
             ArrayList<State> arr = expand(state, this.playerSymbol);
             for (int i = 0; i < arr.size(); i++){
-                value = minValue(arr.get(i), depth+1);
+                value = maxValue(arr.get(i), -10000, 10000, depth+1);
                 if (arr.get(i) != null){
                     if (value > max){
                         max = value;
@@ -78,7 +78,7 @@ public class So_Keisuke_Player extends PlayerDef {
     }
         
 
-    private int maxValue(State state, int depth){
+    private int maxValue(State state, int alpha, int beta, int depth){
         if(state.isTerminal() || depth > DEPTH_LIMIT){
             return eval(state); 
         }
@@ -88,16 +88,19 @@ public class So_Keisuke_Player extends PlayerDef {
             ArrayList<State> arr = expand(state, this.playerSymbol);
             for (State s : arr){
                 if (s != null){
-                    value = minValue(s, depth+1);
+                    value = minValue(s, alpha, beta, depth+1);
                     if (value > max)
                         max = value;
+                    if (max >= beta)
+                        return max;
+                    alpha = max;
                 }
             }
             return max;
         }
     }
 
-    private int minValue(State state, int depth){
+    private int minValue(State state, int alpha, int beta, int depth){
         if(state.isTerminal() || depth > DEPTH_LIMIT){
             return eval(state); 
         }
@@ -107,9 +110,12 @@ public class So_Keisuke_Player extends PlayerDef {
             ArrayList<State> arr = expand(state, opponentSymbol);
             for (State s : arr){
                 if (s != null){
-                    value = maxValue(s, depth+1);
+                    value = maxValue(s, alpha, beta, depth+1);
                     if (value < min)
                         min = value;
+                    if (min <= alpha)
+                        return min;
+                    beta = min;
                 }
             }
             return min;
