@@ -11,7 +11,7 @@ public class So_Keisuke_Player extends PlayerDef {
     public static final int WINDOW_SCORE_4 = 2000;
     public static final int NUM_COLS = 7;
     public static final int NUM_ROWS = 6;
-    public static final int DEPTH_LIMIT = 10;
+    public static final int DEPTH_LIMIT = 5;
 
     State currState;
     char opponentSymbol;
@@ -38,7 +38,7 @@ public class So_Keisuke_Player extends PlayerDef {
      * old minimax working first, and save a copy of it in case you mess something
      * up while working on alpha-beta pruning.
      *
-     * @return the column of the desired move
+     * @return the column index of the desired move
      */
     @Override
     public int getMove(State currState, int timeLeft) {
@@ -46,7 +46,10 @@ public class So_Keisuke_Player extends PlayerDef {
     }
 
     /**
+     * Return a minimum value of the minimax algorithm.
      *
+     * @param state the current state
+     * @return the column index of the next step
      */
     private int minimaxDecision(State state) {
         this.opponentSymbol = (this.playerSymbol == 'O') ? 'X' : 'O';
@@ -69,7 +72,11 @@ public class So_Keisuke_Player extends PlayerDef {
     }
 
     /**
+     * Return a maximum value of the minimax algorithm.
      *
+     * @param state the current state
+     * @param depth the current depth in the minimax algorithm
+     * @return the minimum value based on the given state
      */
     private int maxValue(State state, int depth) {
         if (state.isTerminal() || depth >= DEPTH_LIMIT) {
@@ -86,7 +93,11 @@ public class So_Keisuke_Player extends PlayerDef {
     }
 
     /**
+     * Return a minimum value of the minimax algorithm.
      *
+     * @param state the current state
+     * @param depth the current depth in the minimax algorithm
+     * @return the maximum value based on the given state
      */
     private int minValue(State state, int depth) {
         if (state.isTerminal() || depth >= DEPTH_LIMIT) {
@@ -110,9 +121,11 @@ public class So_Keisuke_Player extends PlayerDef {
      * I recommend using the index in the ArrayList as the column ID. For example, the state
      * resulting from a move in column 0 should be in index 0 of the ArrayList, etc.
      * If a column is full, use a null placeholder in that spot in the ArrayList.
+     *
      * @param currState the state to expand
      * @param symbol the symbol of the player that is about to move. Note that this
      * is not necessarily the same as the playerSymbol field inherited from PlayerDef!
+     * @return next possible states based on the given state
      */
     protected ArrayList<State> expand(State currState, char symbol) {
         State copyCurrState;
@@ -139,6 +152,8 @@ public class So_Keisuke_Player extends PlayerDef {
      * a state as 65, then the other player using the same evaluation
      * function would evaluate it to -65.
      *
+     * @param currState current state
+     * @return total score of the given current state
      */
     protected int eval(State currState) {
         this.currState = currState;
@@ -161,80 +176,60 @@ public class So_Keisuke_Player extends PlayerDef {
 
     /**
      * Returns scores in the given range of rows and columns.
-     * @param startRowID: Starting
-     * @param startColID:
-     * @param rowChange:
-     * @param colChange:
+     *
+     * @param startRowID Starting row
+     * @param startColID Strting column
+     * @param rowChange Changes in row move
+     * @param colChange Changes in column move
+     * @return total score of among the given ranges
      */
     protected int checkWindow(int startRowID, int startColID, int rowChange, int colChange) {
         char currPiece;
-        // int[] window_count_arr = new int[3];
-        // set to default false value for boolean
         int score = 0;
         boolean[] is_window_connected_player = new boolean[3];
         boolean[] is_window_connected_opponent = new boolean[3];
         for(int i = 0;
-        (startRowID + i*rowChange >= 0) && (startColID + i*colChange >= 0) &&
-        (startRowID + i*rowChange < NUM_ROWS) && (startColID + i*colChange < NUM_COLS) && (i < 4);
-        i++) {
-            currPiece = this.currState.getPiece(startRowID + i*rowChange, startColID + i*colChange);
-            if (currPiece == super.playerSymbol)
-            {
-                if (is_window_connected_player[2])
-                {
+            (startRowID + i*rowChange >= 0) && (startColID + i*colChange >= 0) &&
+            (startRowID + i*rowChange < NUM_ROWS) && (startColID + i*colChange < NUM_COLS) && (i < 4);
+            i++) {
+            currPiece = this.currState.getPiece(startRowID + i * rowChange, startColID + i * colChange);
+            if (currPiece == this.playerSymbol) {
+                if (is_window_connected_player[2]) {
                     score += WINDOW_SCORE_4;
                 }
-                else if (is_window_connected_player[1])
-                {
+                else if (is_window_connected_player[1]) {
                     score += WINDOW_SCORE_3;
                     is_window_connected_player[2] = true;
                 }
-                else if (is_window_connected_player[0])
-                {
+                else if (is_window_connected_player[0]) {
                     score += WINDOW_SCORE_2;
                     is_window_connected_player[1] = true;
                 }
-                else
-                {
+                else {
                     score += WINDOW_SCORE_1;
                     is_window_connected_player[0] = true;
                 }
                 is_window_connected_opponent = new boolean[3];
             }
-            else if (currPiece != '_')
-            {
-                if (is_window_connected_opponent[2])
-                {
+            else if (currPiece != '_') {
+                if (is_window_connected_opponent[2]) {
                     score -= WINDOW_SCORE_4;
                 }
-                else if (is_window_connected_opponent[1])
-                {
+                else if (is_window_connected_opponent[1]) {
                     score -= WINDOW_SCORE_3;
                     is_window_connected_opponent[2] = true;
                 }
-                else if (is_window_connected_opponent[0])
-                {
+                else if (is_window_connected_opponent[0]) {
                     score -= WINDOW_SCORE_2;
                     is_window_connected_opponent[1] = true;
                 }
-                else
-                {
+                else {
                     score -= WINDOW_SCORE_1;
                     is_window_connected_opponent[0] = true;
                 }
                 is_window_connected_player = new boolean[3];
             }
-            // System.out.print("ROW: " + (startRowID + i*rowChange));
-            // System.out.print("  COL: " + (startColID + i*colChange));
-            // System.out.print("  SCORE: " + score);
-
         }
-        // System.out.println("");
-        // System.out.println("-------------------");
-        // score += window_count_arr[0];
-        // score += window_count_arr[1];
-        // score += window_count_arr[2];
         return score;
     }
-
 }
