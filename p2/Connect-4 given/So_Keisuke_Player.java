@@ -15,7 +15,7 @@ public class So_Keisuke_Player extends PlayerDef {
     public static final int WINDOW_SCORE_4 = 2000;
     public static final int NUM_COLS = 7;
     public static final int NUM_ROWS = 6;
-    public static final int DEPTH_LIMIT = 5;
+    public static final int DEPTH_LIMIT = 2;
 
     State currState;
     char opponentSymbol;
@@ -59,6 +59,8 @@ public class So_Keisuke_Player extends PlayerDef {
         this.opponentSymbol = (this.playerSymbol == 'O') ? 'X' : 'O';
         int depth = 0;
         int colNum = 0;
+        int alpha = Integer.MIN_VALUE;
+        int beta = Integer.MAX_VALUE;
         int v = Integer.MIN_VALUE;
         int tempV = Integer.MIN_VALUE;
         ArrayList<State> states = expand(state, this.playerSymbol);
@@ -66,10 +68,13 @@ public class So_Keisuke_Player extends PlayerDef {
             State currState = states.get(i);
             if (currState != null) {
                 tempV = v;
-                v = Math.max(v, minValue(currState, depth));
+                v = Math.max(v, minValue(currState, alpha, beta, depth+1));
                 if (v != tempV) {
                     colNum = i;
                 }
+                if (v >= beta)
+                    return v;
+                alpha = Math.max(alpha, v);
             }
         }
         return colNum;
@@ -82,7 +87,7 @@ public class So_Keisuke_Player extends PlayerDef {
      * @param depth the current depth in the minimax algorithm
      * @return the minimum value based on the given state
      */
-    private int maxValue(State state, int depth) {
+    private int maxValue(State state, int alpha, int beta, int depth) {
         if (state.isTerminal() || depth >= DEPTH_LIMIT) {
             return eval(state);
         }
@@ -90,7 +95,10 @@ public class So_Keisuke_Player extends PlayerDef {
         int v = Integer.MIN_VALUE;
         for (State s : expand(state, this.playerSymbol)) {
             if (s != null) {
-                v = Math.max(v, minValue(s, depth+1));
+                v = Math.max(v, minValue(s, alpha, beta, depth+1));
+                if (v >= beta)
+                    return v;
+                alpha = Math.max(alpha, v);
             }
         }
         return v;
@@ -103,7 +111,7 @@ public class So_Keisuke_Player extends PlayerDef {
      * @param depth the current depth in the minimax algorithm
      * @return the maximum value based on the given state
      */
-    private int minValue(State state, int depth) {
+    private int minValue(State state, int alpha, int beta, int depth) {
         if (state.isTerminal() || depth >= DEPTH_LIMIT) {
             // System.out.println(state);
             return eval(state);
@@ -112,7 +120,10 @@ public class So_Keisuke_Player extends PlayerDef {
         int v = Integer.MAX_VALUE;
         for (State s : expand(state, this.opponentSymbol)) {
             if (s != null) {
-                v = Math.min(v, maxValue(s, depth+1));
+                v = Math.min(v, maxValue(s, alpha, beta, depth+1));
+                if (v <= alpha)
+                    return v;
+                beta = Math.min(beta, v);
             }
         }
         return v;
