@@ -25,10 +25,42 @@ public class So_Keisuke_Player extends PlayerDef {
     }
 
     /**
-     * A convenience method for starting a game between a human and a random player.
+     * A convenience method for starting a game between a human and a computer.
      */
-    public static void humanVsRandom() {
+    public static void humanVsComp() {
         Game g = new Game(new HumanDef(), new So_Keisuke_Player(), -1);
+        g.play();
+    }
+    
+    /**
+     * A convenience method for starting a game between a computer and a human.
+     */
+    public static void compVsHuman() {
+        Game g = new Game(new So_Keisuke_Player(), new HumanDef(), -1);
+        g.play();
+    }
+    
+    /**
+     * A convenience method for starting a game between a random player and a computer.
+     */
+    public static void randomVsComp() {
+        Game g = new Game(new RandomDef(), new So_Keisuke_Player(), -1);
+        g.play();
+    }
+
+    /**
+     * A convenience method for starting a game between a computer and a random player.
+     */
+    public static void compVsRandom() {
+        Game g = new Game(new So_Keisuke_Player(), new RandomDef(), -1);
+        g.play();
+    }
+    
+    /**
+     * A convenience method for starting a game between a computer and a computer.
+     */
+    public static void compVComp() {
+        Game g = new Game(new So_Keisuke_Player(), new So_Keisuke_Player(), -1);
         g.play();
     }
 
