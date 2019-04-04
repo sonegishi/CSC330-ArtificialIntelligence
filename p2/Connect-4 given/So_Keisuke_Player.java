@@ -176,80 +176,60 @@ public class So_Keisuke_Player extends PlayerDef {
 
     /**
      * Returns scores in the given range of rows and columns.
-     * @param startRowID: Starting
-     * @param startColID:
-     * @param rowChange:
-     * @param colChange:
+     *
+     * @param startRowID Starting row
+     * @param startColID Strting column
+     * @param rowChange Changes in row move
+     * @param colChange Changes in column move
+     * @return total score of among the given ranges
      */
     protected int checkWindow(int startRowID, int startColID, int rowChange, int colChange) {
         char currPiece;
-        // int[] window_count_arr = new int[3];
-        // set to default false value for boolean
         int score = 0;
         boolean[] is_window_connected_player = new boolean[3];
         boolean[] is_window_connected_opponent = new boolean[3];
         for(int i = 0;
-        (startRowID + i*rowChange >= 0) && (startColID + i*colChange >= 0) &&
-        (startRowID + i*rowChange < NUM_ROWS) && (startColID + i*colChange < NUM_COLS) && (i < 4);
-        i++) {
-            currPiece = this.currState.getPiece(startRowID + i*rowChange, startColID + i*colChange);
-            if (currPiece == super.playerSymbol)
-            {
-                if (is_window_connected_player[2])
-                {
+            (startRowID + i*rowChange >= 0) && (startColID + i*colChange >= 0) &&
+            (startRowID + i*rowChange < NUM_ROWS) && (startColID + i*colChange < NUM_COLS) && (i < 4);
+            i++) {
+            currPiece = this.currState.getPiece(startRowID + i * rowChange, startColID + i * colChange);
+            if (currPiece == this.playerSymbol) {
+                if (is_window_connected_player[2]) {
                     score += WINDOW_SCORE_4;
                 }
-                else if (is_window_connected_player[1])
-                {
+                else if (is_window_connected_player[1]) {
                     score += WINDOW_SCORE_3;
                     is_window_connected_player[2] = true;
                 }
-                else if (is_window_connected_player[0])
-                {
+                else if (is_window_connected_player[0]) {
                     score += WINDOW_SCORE_2;
                     is_window_connected_player[1] = true;
                 }
-                else
-                {
+                else {
                     score += WINDOW_SCORE_1;
                     is_window_connected_player[0] = true;
                 }
                 is_window_connected_opponent = new boolean[3];
             }
-            else if (currPiece != '_')
-            {
-                if (is_window_connected_opponent[2])
-                {
+            else if (currPiece != '_') {
+                if (is_window_connected_opponent[2]) {
                     score -= WINDOW_SCORE_4;
                 }
-                else if (is_window_connected_opponent[1])
-                {
+                else if (is_window_connected_opponent[1]) {
                     score -= WINDOW_SCORE_3;
                     is_window_connected_opponent[2] = true;
                 }
-                else if (is_window_connected_opponent[0])
-                {
+                else if (is_window_connected_opponent[0]) {
                     score -= WINDOW_SCORE_2;
                     is_window_connected_opponent[1] = true;
                 }
-                else
-                {
+                else {
                     score -= WINDOW_SCORE_1;
                     is_window_connected_opponent[0] = true;
                 }
                 is_window_connected_player = new boolean[3];
             }
-            // System.out.print("ROW: " + (startRowID + i*rowChange));
-            // System.out.print("  COL: " + (startColID + i*colChange));
-            // System.out.print("  SCORE: " + score);
-
         }
-        // System.out.println("");
-        // System.out.println("-------------------");
-        // score += window_count_arr[0];
-        // score += window_count_arr[1];
-        // score += window_count_arr[2];
         return score;
     }
-
 }
