@@ -5,13 +5,13 @@ import java.util.ArrayList;
  * to something unique just for your team.
  */
 public class So_Keisuke_Player extends PlayerDef {
-    public static final int WINDOW_SCORE_1 = 1;
-    public static final int WINDOW_SCORE_2 = 8;
-    public static final int WINDOW_SCORE_3 = 27;
-    public static final int WINDOW_SCORE_4 = 2019;
+    public static final int WINDOW_SCORE_1 = 0;
+    public static final int WINDOW_SCORE_2 = 50;
+    public static final int WINDOW_SCORE_3 = 200;
+    public static final int WINDOW_SCORE_4 = 2000;
     public static final int NUM_COLS = 7;
     public static final int NUM_ROWS = 6;
-    public static final int DEPTH_LIMIT = 4;
+    public static final int DEPTH_LIMIT = 10;
 
     State currState;
     char opponentSymbol;
@@ -42,43 +42,44 @@ public class So_Keisuke_Player extends PlayerDef {
      */
     @Override
     public int getMove(State currState, int timeLeft) {
-        return maxValueFirstTime(currState, timeLeft);
+        return minimaxDecision(currState);
     }
 
     /**
      *
      */
-    private int maxValueFirstTime(State currState, int timeLeft) {
+    private int minimaxDecision(State state) {
         this.opponentSymbol = (this.playerSymbol == 'O') ? 'X' : 'O';
-
         int depth = 0;
         int colNum = 0;
         int v = Integer.MIN_VALUE;
         int tempV = Integer.MIN_VALUE;
-        ArrayList<State> states = expand(currState, playerSymbol);
+        ArrayList<State> states = expand(state, this.playerSymbol);
         for (int i = 0; i < states.size(); i++) {
-            tempV = v;
-            v = Math.max(v, minValue(states.get(i), timeLeft, depth));
-            if (v != tempV) {
-                colNum = i;
+            State currState = states.get(i);
+            if (currState != null) {
+                tempV = v;
+                v = Math.max(v, minValue(currState, depth));
+                if (v != tempV) {
+                    colNum = i;
+                }
             }
         }
-        System.out.println("MAX_VALUE "+ colNum + ": " + v + "\n");
         return colNum;
     }
 
     /**
      *
      */
-    private int maxValue(State currState, int timeLeft, int depth) {
-        if (currState.isTerminal() || depth >= DEPTH_LIMIT) {
-            return eval(currState);
+    private int maxValue(State state, int depth) {
+        if (state.isTerminal() || depth >= DEPTH_LIMIT) {
+            return eval(state);
         }
 
         int v = Integer.MIN_VALUE;
-        for (State s : expand(currState, playerSymbol)) {
+        for (State s : expand(state, this.playerSymbol)) {
             if (s != null) {
-                v = Math.max(v, minValue(s, timeLeft, depth+1));
+                v = Math.max(v, minValue(s, depth+1));
             }
         }
         return v;
@@ -87,15 +88,15 @@ public class So_Keisuke_Player extends PlayerDef {
     /**
      *
      */
-    private int minValue(State currState, int timeLeft, int depth) {
-        if (currState.isTerminal() || depth >= DEPTH_LIMIT) {
-            return eval(currState);
+    private int minValue(State state, int depth) {
+        if (state.isTerminal() || depth >= DEPTH_LIMIT) {
+            return eval(state);
         }
 
         int v = Integer.MAX_VALUE;
-        for (State s : expand(currState, opponentSymbol)) {
+        for (State s : expand(state, this.opponentSymbol)) {
             if (s != null) {
-                v = Math.min(v, maxValue(s, timeLeft, depth+1));
+                v = Math.min(v, maxValue(s, depth+1));
             }
         }
         return v;
