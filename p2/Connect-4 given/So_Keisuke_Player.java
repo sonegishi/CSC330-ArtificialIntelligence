@@ -5,9 +5,6 @@ import java.util.ArrayList;
  * to something unique just for your team.
  */
 public class So_Keisuke_Player extends PlayerDef {
-    public static void main(String[] args) {
-        humanVsRandom();
-    }
 
     public static final int WINDOW_SCORE_1 = 0;
     public static final int WINDOW_SCORE_2 = 50;
