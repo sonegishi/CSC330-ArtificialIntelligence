@@ -38,7 +38,7 @@ public class So_Keisuke_Player extends PlayerDef {
      * old minimax working first, and save a copy of it in case you mess something
      * up while working on alpha-beta pruning.
      *
-     * @return the column of the desired move
+     * @return the column index of the desired move
      */
     @Override
     public int getMove(State currState, int timeLeft) {
@@ -46,7 +46,10 @@ public class So_Keisuke_Player extends PlayerDef {
     }
 
     /**
+     * Return a minimum value of the minimax algorithm.
      *
+     * @param state the current state
+     * @return the column index of the next step
      */
     private int minimaxDecision(State state) {
         this.opponentSymbol = (this.playerSymbol == 'O') ? 'X' : 'O';
@@ -69,7 +72,11 @@ public class So_Keisuke_Player extends PlayerDef {
     }
 
     /**
+     * Return a maximum value of the minimax algorithm.
      *
+     * @param state the current state
+     * @param depth the current depth in the minimax algorithm
+     * @return the minimum value based on the given state
      */
     private int maxValue(State state, int depth) {
         if (state.isTerminal() || depth >= DEPTH_LIMIT) {
@@ -86,7 +93,11 @@ public class So_Keisuke_Player extends PlayerDef {
     }
 
     /**
+     * Return a minimum value of the minimax algorithm.
      *
+     * @param state the current state
+     * @param depth the current depth in the minimax algorithm
+     * @return the maximum value based on the given state
      */
     private int minValue(State state, int depth) {
         if (state.isTerminal() || depth >= DEPTH_LIMIT) {
@@ -110,9 +121,11 @@ public class So_Keisuke_Player extends PlayerDef {
      * I recommend using the index in the ArrayList as the column ID. For example, the state
      * resulting from a move in column 0 should be in index 0 of the ArrayList, etc.
      * If a column is full, use a null placeholder in that spot in the ArrayList.
+     *
      * @param currState the state to expand
      * @param symbol the symbol of the player that is about to move. Note that this
      * is not necessarily the same as the playerSymbol field inherited from PlayerDef!
+     * @return next possible states based on the given state
      */
     protected ArrayList<State> expand(State currState, char symbol) {
         State copyCurrState;
@@ -139,6 +152,8 @@ public class So_Keisuke_Player extends PlayerDef {
      * a state as 65, then the other player using the same evaluation
      * function would evaluate it to -65.
      *
+     * @param currState current state
+     * @return total score of the given current state
      */
     protected int eval(State currState) {
         this.currState = currState;
