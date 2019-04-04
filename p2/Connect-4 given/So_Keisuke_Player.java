@@ -94,7 +94,6 @@ public class So_Keisuke_Player extends PlayerDef {
      */
     private int minValue(State state, int depth) {
         if (state.isTerminal() || depth >= DEPTH_LIMIT) {
-            // System.out.println(state);
             return eval(state);
         }
 
