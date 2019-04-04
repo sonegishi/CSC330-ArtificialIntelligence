@@ -11,7 +11,7 @@ public class So_Keisuke_Player extends PlayerDef {
     public static final int WINDOW_SCORE_4 = 2000;
     public static final int NUM_COLS = 7;
     public static final int NUM_ROWS = 6;
-    public static final int DEPTH_LIMIT = 10;
+    public static final int DEPTH_LIMIT = 5;
 
     State currState;
     char opponentSymbol;
