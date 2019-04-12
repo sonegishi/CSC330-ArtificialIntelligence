@@ -55,8 +55,11 @@ public class Perceptron {
      * Determine the output this perceptron gives on the given inputs.
      */
     public double computeOutput(double[] inputs) {
-        // TO DO
-        return 0;
+        double sum = -1 * biasWeight;
+        for (int i = 0; i < inputs.length; i++){
+            sum += inputs[i] * weights[i];
+        }
+        return Sigmoid.sig(sum);
     }
     
     /**
