@@ -55,9 +55,9 @@ public class Perceptron {
      * Determine the output this perceptron gives on the given inputs.
      */
     public double computeOutput(double[] inputs) {
-        double sum = -1 * biasWeight;
+        double sum = -1 * this.biasWeight;
         for (int i = 0; i < inputs.length; i++){
-            sum += inputs[i] * weights[i];
+            sum += inputs[i] * this.weights[i];
         }
         return Sigmoid.sig(sum);
     }
@@ -66,12 +66,12 @@ public class Perceptron {
      * Update the weights based on correctOutput for the given inputs.
      */
     public void train1Example(double[] inputs, double correctOutput) {
-        double a = computeOutput(inputs);
+        double a = this.computeOutput(inputs);
         double err = correctOutput - a;
         double delta = err * a * (1 - a);
-        biasWeight = biasWeight + learningRate * -1 * delta;
-        for (int i = 0; i < weights.length; i++){
-            weights[i] = weights[i] + learningRate * inputs[i] * delta;
+        this.biasWeight = this.biasWeight + this.learningRate * -1 * delta;
+        for (int i = 0; i < this.weights.length; i++){
+            this.weights[i] = this.weights[i] + this.learningRate * inputs[i] * delta;
         }
     }
     
@@ -91,7 +91,7 @@ public class Perceptron {
     public void trainEpochs(Example[] examples, int perceptronID, int numEpochs) {
         for (int i = 0; i < numEpochs; i++){
             for (Example example : examples){
-                train1Example(example.inputs, example.outputs[perceptronID]);
+                this.train1Example(example.inputs, example.outputs[perceptronID]);
             }
         }
     }
