@@ -26,7 +26,7 @@ public class Perceptron {
         RandomWeightGenerator wtGen = new RandomWeightGenerator(weightRange);
         for(int j = 0; j < weights.length; j++)
             weights[j] = wtGen.generateWeight();
-            
+        
         this.biasWeight = wtGen.generateWeight();
         this.learningRate = learningRate;
     }
@@ -55,15 +55,24 @@ public class Perceptron {
      * Determine the output this perceptron gives on the given inputs.
      */
     public double computeOutput(double[] inputs) {
-        // TO DO
-        return 0;
+        double sum = -1 * biasWeight;
+        for (int i = 0; i < inputs.length; i++){
+            sum += inputs[i] * weights[i];
+        }
+        return Sigmoid.sig(sum);
     }
     
     /**
      * Update the weights based on correctOutput for the given inputs.
      */
     public void train1Example(double[] inputs, double correctOutput) {
-        // TO DO
+        double a = computeOutput(inputs);
+        double err = correctOutput - a;
+        double delta = err * a * (1 - a);
+        biasWeight = biasWeight + learningRate * -1 * delta;
+        for (int i = 0; i < weights.length; i++){
+            weights[i] = weights[i] + learningRate * inputs[i] * delta;
+        }
     }
     
     /**
@@ -80,7 +89,11 @@ public class Perceptron {
      * to train on.
      */
     public void trainEpochs(Example[] examples, int perceptronID, int numEpochs) {
-        // TO DO
+        for (int i = 0; i < numEpochs; i++){
+            for (Example example : examples){
+                train1Example(example.inputs, example.outputs[perceptronID]);
+            }
+        }
     }
     
     public static void testPerceptronOutput() {
