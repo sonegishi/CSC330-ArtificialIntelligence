@@ -122,7 +122,7 @@ public class MultilayerNetwork {
      */
     public void train1Example(Example ex) {
         // Get the outputs of every output unit
-        double[] outputs = computeOutput(ex.inputs);
+        double[] outputs = this.computeOutput(ex.inputs);
         
         // Compute Erri and deltai for every output unit i
         double err[] = new double[this.numOutput];
@@ -134,9 +134,9 @@ public class MultilayerNetwork {
         
         // Compute deltaj for hidden unit j
         double deltaj[] = new double[this.numHidden];
-        double sum = 0;
+        double sum;
         for (int j = 0; j < this.numHidden; j++){
-            // double sum = 0;
+            sum = 0;
             for (int i = 0; i < this.numOutput; i++){
                 sum += this.hoWeights[j][i] * deltai[i];
             }
