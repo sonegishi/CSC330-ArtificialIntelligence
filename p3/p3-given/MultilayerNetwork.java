@@ -87,22 +87,24 @@ public class MultilayerNetwork {
     }
 
     public double[] computeOutput(double[] inputs) {
-        double[] outputs = new double[numHidden + numOutput];
-        // calculation from input to hidden layer
-        for (int h = 0; h < numHidden; h++){
-            outputs[h] = -1 * bhWeights[h];
+        double[] outputs = new double[this.numHidden + this.numOutput];
+        
+        // Compute output neurons in the hidden layer
+        for (int h = 0; h < this.numHidden; h++){
+            outputs[h] = -1 * this.bhWeights[h];
             for (int i = 0; i < numInput; i++){
-                outputs[h] += inputs[i] * ihWeights[i][h];
+                outputs[h] += inputs[i] * this.ihWeights[i][h];
             }
             outputs[h] = Sigmoid.sig(outputs[h]);
         }
-        // calculating from hidden layer to output layer
-        for (int o = 0; o < numOutput; o++){
-            outputs[numHidden + o] = -1 * this.boWeights[o];
-            for (int h = 0; h < numHidden; h++){
-                outputs[numHidden + o] += outputs[h] * hoWeights[h][o];
+
+        // Compute output neurons in the output layer
+        for (int o = 0; o < this.numOutput; o++){
+            outputs[this.numHidden + o] = -1 * this.boWeights[o];
+            for (int h = 0; h < this.numHidden; h++){
+                outputs[this.numHidden + o] += outputs[h] * this.hoWeights[h][o];
             }
-            outputs[numHidden + o] = Sigmoid.sig(outputs[numHidden + o]);
+            outputs[this.numHidden + o] = Sigmoid.sig(outputs[this.numHidden + o]);
         }
         return outputs;
     }
@@ -119,35 +121,41 @@ public class MultilayerNetwork {
      * Compute the new Wk,j weights - the weights from input to hidden.
      */
     public void train1Example(Example ex) {
+        // Get the outputs of every output unit
         double[] outputs = computeOutput(ex.inputs);
-        // Compute err and deltai
-        double err[] = new double[numOutput];
-        double deltai[] = new double[numOutput];
-        for(int i = 0; i < numOutput; i++){
-            err[i] = ex.outputs[i] - outputs[numHidden+i];
-            deltai[i] = err[i] * outputs[numHidden+i] * (1 - outputs[numHidden+i]);
+        
+        // Compute Erri and deltai for every output unit i
+        double err[] = new double[this.numOutput];
+        double deltai[] = new double[this.numOutput];
+        for(int i = 0; i < this.numOutput; i++){
+            err[i] = ex.outputs[i] - outputs[this.numHidden + i];
+            deltai[i] = err[i] * outputs[this.numHidden + i] * (1 - outputs[this.numHidden + i]);
         }
-        // compute deltaj
-        double deltaj[] = new double[numHidden];
+        
+        // Compute deltaj for hidden unit j
+        double deltaj[] = new double[this.numHidden];
         double sum = 0;
-        for (int j = 0; j < numHidden; j++){
-            for (int i = 0; i < numOutput; i++){
-                sum += hoWeights[j][i] * deltai[i];
+        for (int j = 0; j < this.numHidden; j++){
+            // double sum = 0;
+            for (int i = 0; i < this.numOutput; i++){
+                sum += this.hoWeights[j][i] * deltai[i];
             }
-            deltaj[j] = outputs[j] * (1-outputs[j]) * sum;
+            deltaj[j] = outputs[j] * (1 - outputs[j]) * sum;
         }
-        // compute Wj,i
-        for (int i = 0; i < numOutput; i++){
-            boWeights[i] += learningRate * -1 * deltai[i];
-            for (int j = 0; j < numHidden; j++){
-                hoWeights[j][i] += learningRate * outputs[j] * deltai[i];
+        
+        // Compute the new Wj,i weights
+        for (int i = 0; i < this.numOutput; i++){
+            this.boWeights[i] += this.learningRate * -1 * deltai[i];
+            for (int j = 0; j < this.numHidden; j++){
+                this.hoWeights[j][i] += this.learningRate * outputs[j] * deltai[i];
             }
         }
-        // compute Wk,j
-        for (int j = 0; j < numHidden; j++){
-            bhWeights[j] += learningRate * -1 * deltaj[j];
-            for (int k = 0; k < numInput; k++){
-                ihWeights[k][j] += learningRate * ex.inputs[k] * deltaj[j];
+        
+        // Compute the new Wk,j weights
+        for (int j = 0; j < this.numHidden; j++){
+            this.bhWeights[j] += this.learningRate * -1 * deltaj[j];
+            for (int k = 0; k < this.numInput; k++){
+                this.ihWeights[k][j] += this.learningRate * ex.inputs[k] * deltaj[j];
             }
         }
     }
