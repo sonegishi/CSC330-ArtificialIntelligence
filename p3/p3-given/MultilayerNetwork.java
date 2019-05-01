@@ -153,8 +153,32 @@ public class MultilayerNetwork {
     }
 
     public void trainEpochs(Example[] examples, int numEpochs) {
-        for (int i = 0; i < numEpochs; i++){
-            train1Example(examples[i]);
+        for (int e = 0; e < numEpochs; e++){
+            System.out.println("epoch " + (e + 1) + ": ");
+            for (int j = 0; j < examples.length; j++) {
+                this.train1Example(examples[j]);
+            }
+            System.out.println("bhWeights:");
+            for (int h = 0; h < this.numHidden; h++) {
+                System.out.print(" " + this.bhWeights[h]);
+            }
+            System.out.println("\nboWeights:");
+            for (int o = 0; o < this.numOutput; o++) {
+                System.out.print(" " + this.boWeights[o]);
+            }
+            System.out.println("\nihWeights:");
+            for (int h = 0; h < this.numHidden; h++) {
+                for (int i = 0; i < this.numInput; i++) {
+                    System.out.print(" " + this.ihWeights[i][h]);
+                }
+            }
+            System.out.println("\nhoWeights:");
+            for (int o = 0; o < this.numOutput; o++) {
+                for (int h = 0; h < this.numHidden; h++) {
+                    System.out.print(" " + this.hoWeights[h][o]);
+                }
+            }
+            System.out.println("\n");
         }
     }
 
